@@ -1,9 +1,11 @@
 function _init()
-    player = Player(1, 1)
+    gravity = 0.3
+    friction = 0.85
+    player = Player(8, 8)
     burger = Burger()
 end
 
-function _update()
+function _update60()
     player.update()
     burger.update()
 end

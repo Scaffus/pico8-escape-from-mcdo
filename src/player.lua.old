@@ -1,0 +1,76 @@
+function Player(_x, _y)
+    local player = {}
+    player.x = _x
+    player.y = _y
+
+    player.speed = 3
+
+    player.dx = 0
+    player.dy = 0
+
+    player.is_jumping = false
+
+    player.jump_force = 4
+    player.mass = 1
+
+    player.update = function()
+        -- X axis
+        player.dx = 0
+
+        if btn(0) then
+            player.dx = -player.speed
+        end
+        if btn(1) then
+            player.dx = player.speed
+        end
+
+        if not check_flag(0, (player.x + player.dx), player.y) then
+            player.x = player.x + player.dx
+        end
+
+        -- Y axis
+        F = (1/2) * player.mass * (player.jump_force^2)
+
+        if check_flag(0, player.x, player.y) then
+            player.y = player.y-3
+        end
+        
+        if is_grounded(player.x, player.y, 8) then
+            player.dy = 0
+            -- Prevents the player from being inside the floor
+            player.y = 8 * flr(player.y/8)
+            if btnp(4) then
+                player.is_jumping = true
+            end
+        else
+            player.dy = F
+        end
+
+        -- Jump
+        if player.is_jumping then
+            if not check_flag(0, player.x, player.y -F) then
+                player.dy = -F
+                player.jump_force = player.jump_force - 1
+                
+                if player.jump_force < 0 then
+                    player.mass = -1
+                end
+                
+                if player.jump_force == -5 then
+                    player.is_jumping = false
+                    player.dy = 0
+                    player.jump_force = 4
+                    player.mass = 1
+                end
+            end
+        end
+
+        player.y = player.y + player.dy
+    end
+
+    player.draw = function()
+        spr(1, player.x, player.y)
+    end
+
+    return player
+end
