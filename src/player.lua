@@ -19,6 +19,8 @@ function Player(_x, _y)
     player.acceleration = 0.9
     player.boost = 4
 
+    player.hp = 3
+
     player.update = function()
         player.dy += gravity
         player.dx *= friction
@@ -90,7 +92,7 @@ function Player(_x, _y)
     end
 
     player.draw = function()
-        spr(1, player.x, player.y)
+        spr(player_sprite, player.x, player.y)
     end
 
     player.animate = function()
