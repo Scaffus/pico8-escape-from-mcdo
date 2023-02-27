@@ -9,7 +9,7 @@ function Burger()
     end
 
     burger.draw = function()
-        spr(burger_sprite, burger.x, burger.y)
+        spr(sprites.burger.default, burger.x, burger.y)
     end
 
     return burger

@@ -21,6 +21,12 @@ function Player(_x, _y)
 
     player.hp = 3
 
+    player.score = 0
+    player.pos_score = 0
+    player.kill_score = 0
+    player.fries_score = 0
+    player.max_x_reached = 0
+
     player.update = function()
         player.dy += gravity
         player.dx *= friction
@@ -44,7 +50,7 @@ function Player(_x, _y)
             player.running = false
         end
 
-        if btn(4)
+        if btn(2)
         and player.landed then
             player.dy -= player.boost
             player.landed = false
@@ -89,10 +95,21 @@ function Player(_x, _y)
 
         player.x += player.dx
         player.y += player.dy
+
+        -- Score
+        if player.x > player.max_x_reached then
+            player.max_x_reached = player.x
+        end
+
+        if player.x == player.max_x_reached then
+            player.pos_score = flr(player.x / 10) * 10
+        end
+
+        player.score = player.pos_score + player.kill_score + player.fries_score
     end
 
     player.draw = function()
-        spr(player_sprite, player.x, player.y)
+        spr(sprites.player.default, player.x, player.y)
     end
 
     player.animate = function()
