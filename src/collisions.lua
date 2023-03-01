@@ -4,6 +4,19 @@ function collide_map(object, direction, flag)
     local w = object.width
     local h = object.height
 
+    x1, y1, x2, y2 = calculate_coords(x, y, h, w, direction)
+
+    if fget(mget(x1, y1), flag)
+    or fget(mget(x1, y2), flag)
+    or fget(mget(x2, y1), flag)
+    or fget(mget(x2, y2), flag) then
+        return true
+    else 
+        return false
+    end
+end
+
+function calculate_coords(x, y, h, w, direction)
     local x1 = 0
     local y1 = 0
     local x2 = 0
@@ -36,12 +49,34 @@ function collide_map(object, direction, flag)
     x2 /= 8
     y2 /= 8
 
-    if fget(mget(x1, y1), flag)
-    or fget(mget(x1, y2), flag)
-    or fget(mget(x2, y1), flag)
-    or fget(mget(x2, y2), flag) then
-        return true
-    else 
+    return x1, y1, x2, y2
+end
+
+function abs_box(s)
+    local box = {}
+
+    box.x1 = s.box.x1 + s.x
+    box.y1 = s.box.y1 + s.y
+    box.x2 = s.box.x2 + s.x
+    box.y2 = s.box.y2 + s.y
+
+    return box
+end
+
+function collide(a,b)
+    if a.is_dummy or b.is_dummy then
+        return
+    end
+
+    local box_a = abs_box(a)
+    local box_b = abs_box(b)
+
+    if box_a.x1 > box_b.x2 or
+        box_a.y1 > box_b.y2 or
+        box_b.x1 > box_a.x2 or
+        box_b.y1 > box_a.y2 then
         return false
     end
+
+    return true
 end

@@ -4,6 +4,7 @@ __lua__
 #include src/main.lua
 #include src/player.lua
 #include src/burger.lua
+#include src/fries.lua
 #include src/utils.lua
 #include src/collisions.lua
 #include src/hud.lua

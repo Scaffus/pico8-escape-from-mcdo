@@ -15,3 +15,22 @@ end
 function limit_speed(num,maximum)
   return mid(-maximum,num,maximum)
 end 
+
+function check_flags(flags, celx, cely)
+    sprite = mget(celx, cely)
+    for _, flag in pairs(flags) do
+        if not fget(sprite, flag) then 
+            return false
+        end
+    end
+    return true
+end
+
+function indexOf(array, value)
+    for i, v in ipairs(array) do
+        if v == value then
+            return i
+        end
+    end
+    return nil
+end
