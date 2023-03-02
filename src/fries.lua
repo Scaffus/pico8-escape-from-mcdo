@@ -51,17 +51,3 @@ function Fries(x_, y_)
 
     return fries
 end
-
-function Dummy()
-    local dummy = {}
-
-    dummy.is_dummy = true
-
-    dummy.update = function()
-    end
-
-    dummy.draw = function()
-    end
-
-    return dummy
-end

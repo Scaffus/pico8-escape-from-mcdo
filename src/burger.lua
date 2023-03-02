@@ -55,7 +55,7 @@ function Burger(x, y)
     end
 
     burger.draw = function()
-        spr(sprites.burger.default, burger.x, burger.y, 1, 1, burger.flip)
+        spr(burgers_sprite, burger.x, burger.y, 1, 1, burger.flip)
     end
 
     return burger

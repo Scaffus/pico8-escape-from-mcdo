@@ -64,10 +64,6 @@ function abs_box(s)
 end
 
 function collide(a,b)
-    if a.is_dummy or b.is_dummy then
-        return
-    end
-
     local box_a = abs_box(a)
     local box_b = abs_box(b)
 

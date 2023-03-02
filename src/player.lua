@@ -6,10 +6,10 @@ function Player(_x, _y)
     player.height = 8
 
     player.box = {
-        x1 = 0,
+        x1 = -1,
         y1 = 0,
-        x2 = 8,
-        y2 = 8
+        x2 = 9,
+        y2 = 9
     }
 
     player.jumping = false
@@ -18,7 +18,9 @@ function Player(_x, _y)
     player.running = false
     player.flip = false
 
-    player.current_sprite = sprites.player.default
+    player.ani_cooldown = 4
+    player.last_ani = 0
+    player.current_frame = 1
     
     player.dx = 0
     player.dy = 0
@@ -28,11 +30,12 @@ function Player(_x, _y)
     player.acceleration = 1
     player.boost = 4
     
+    player.won = false
     player.is_dead = false
     player.hp = 3
     player.hit_cooldown = 15
     player.last_hit = 0
-    player.invulnerable = 0
+    player.is_invulnerable = 0
     
     player.score = 0
     player.pos_score = 0
@@ -42,7 +45,12 @@ function Player(_x, _y)
     player.max_x_reached = 0
     
     player.update = function()
-        if player.is_dead then 
+        -- Win
+        if player.x >= 103 * 8 then
+            player.won = true
+        end
+
+        if player.is_dead or player.won then 
             return
         end
         
@@ -91,6 +99,10 @@ function Player(_x, _y)
                 if collide_map(player, "down", 1) then
                     player.damage(1)
                 end
+                -- Frier
+                if collide_map(player, "down", 2) then
+                    player.damage(player.hp)
+                end
             end
         elseif player.dy < 0 then
             player.jumping = true
@@ -118,15 +130,31 @@ function Player(_x, _y)
         player.x += player.dx
         player.y += player.dy
 
-        -- Fries & Burgers collisions & collection
+        -- Fries, Sauces & Burgers collisions & collection
         local celx, cely = flr(player.x / 8), flr(player.y / 8)
 
         -- Fries
         for _, frie in pairs(fries) do
             if collide(player, frie) then
                 player.kill_score += scores.fries
-                fries[indexOf(fries, frie)] = Dummy()
+                del(fries, frie)
             end 
+        end
+        
+        -- Sauces
+        for _, sauce in pairs(sauces) do
+            if collide(player, sauce) then
+                if sauce.type == "ketchup" then
+                    player.heal(1)
+                elseif sauce.type == "mayonnaise" then
+                    player.is_shielded = true
+                elseif sauce.type == "potatoes" then
+                    player.max_dx *= 1.5
+                    player.max_dy *= 1.5
+                    player.boost = 5.5
+                end
+                del(sauces, sauce)
+            end
         end
 
         -- Burgers
@@ -135,7 +163,7 @@ function Player(_x, _y)
                 -- Burger kapout
                 if player.y > burger.y then
                     player.kill_score += scores.burger
-                    burgers[indexOf(burgers, burger)] = Dummy()
+                    del(burgers, burger)
                 -- Player kapout
                 else
                     player.damage(1)
@@ -159,25 +187,40 @@ function Player(_x, _y)
         player.last_hit = player.last_hit + 1
         if player.last_hit >= player.hit_cooldown then
             player.last_hit = 0
-            player.invulnerable = false
+            player.is_invulnerable = false
         else
-            player.invulnerable = true
+            player.is_invulnerable = true
         end
 
-        if player.is_dead then
-            player.current_sprite = sprites.player.dead[1]
+        player.last_ani += 1
+        if player.last_ani >= player.ani_cooldown then
+            player.last_ani = 0
+            if player.current_frame + 1 <= #sprites.player.running then
+                player.current_frame += 1
+            else
+                player.current_frame = 1
+            end
         end
     end
 
     player.draw = function()
-        spr(player.current_sprite, player.x, player.y, 1, 1, player.flip)
+        if player.is_dead then
+            spr(sprites.player.dead, player.x, player.y, 1, 1, player.flip)
+        else
+            spr(sprites.player.running[player.current_frame], player.x, player.y, 1, 1, player.flip)
+        end
     end
 
     player.animate = function()
     end
 
     player.damage = function(num)
-        if player.invulnerable then 
+        if player.is_invulnerable then 
+            return
+        end
+
+        if player.is_shielded then
+            player.is_shielded = false
             return
         end
 
@@ -185,6 +228,12 @@ function Player(_x, _y)
 
         if player.hp < 1 then
             player.is_dead = true
+        end
+    end
+
+    player.heal = function(num)
+        if player.hp + num <= 3 then
+            player.hp += num
         end
     end
 

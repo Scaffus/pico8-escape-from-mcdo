@@ -34,3 +34,30 @@ function indexOf(array, value)
     end
     return nil
 end
+
+function draw_text(text, y, x_centered, text_color, background, background_color, border, border_color) 
+        local length = #text * char_width
+        local start_x, start_y = 0, y
+
+        if border then
+            start_x = 2
+        elseif background then
+            start_x = 1
+        end 
+        
+        if x_centered then
+            start_x += 64 - length / 2
+        end
+
+        local end_x, end_y = start_x + length - char_width / 2, y + char_height - 1 
+
+        if border then
+            rectfill(start_x - 2, start_y - 2, end_x + 2, end_y + 2, border_color)
+        end
+
+        if background then
+            rectfill(start_x - 1, start_y - 1, end_x + 1, end_y + 1, background_color)
+        end
+
+        print(text, start_x, start_y, text_color)
+    end
